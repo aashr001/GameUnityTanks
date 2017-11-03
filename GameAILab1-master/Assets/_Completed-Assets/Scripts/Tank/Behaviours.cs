@@ -93,9 +93,11 @@ namespace Complete
                                                 Operator.IS_SMALLER_OR_EQUAL, 0.1f,
                                                 Stops.IMMEDIATE_RESTART,
                             // Stop turning and fire
-                            new Sequence(StopTurning(),
-                                        new Wait(2f),
-                                        RandomFire())),
+                            new Sequence(
+                                  StopTurning(),
+                                  new Wait(2f),
+                                  RandomFire()
+                                  )),
                         new BlackboardCondition("targetOnRight",
                                                 Operator.IS_EQUAL, true,
                                                 Stops.IMMEDIATE_RESTART,
@@ -107,7 +109,6 @@ namespace Complete
                 )
             );
         }
-
 
         //(0.Fun) Constantly spin, move and fire on the spot 
         private Root FunBehaviour(float move, float turn, float shoot){
@@ -129,9 +130,11 @@ namespace Complete
                                                 Operator.IS_SMALLER_OR_EQUAL, 0.1f,
                                                 Stops.IMMEDIATE_RESTART,
                             // Move towards opponent, turn and fire
-                            new Sequence(new Action(() => Move(0.4f)),
-                        new Action(() => Turn(1f)),
-                        new Action(() => Fire(-1f)))),
+                            new Sequence(
+                                new Action(() => Move(0.4f)),
+                                new Action(() => Turn(1f)),
+                                new Action(() => Fire(-1f))
+                            )),
                         new BlackboardCondition("targetOnRight",
                                                 Operator.IS_EQUAL, true,
                                                 Stops.IMMEDIATE_RESTART,
@@ -154,11 +157,11 @@ namespace Complete
                         new BlackboardCondition("targetOffCentre",
                                                 Operator.IS_SMALLER_OR_EQUAL, 0.1f,
                                                 Stops.IMMEDIATE_RESTART,
-                            // Move away from opponent
-                            new Sequence(
-                                new Action(() => Turn(1f)),
-                                new Action(() => Move(-0.5f))
-                        )),
+                                 // Move away from opponent
+                                new Sequence(
+                                    new Action(() => Turn(1f)),
+                                    new Action(() => Move(-0.5f))
+                                )),
                         new BlackboardCondition("targetOnRight",
                                                 Operator.IS_EQUAL, true,
                                                 Stops.IMMEDIATE_RESTART,
@@ -180,15 +183,12 @@ namespace Complete
                     new Selector(
                         new BlackboardCondition("targetOffCentre",
                                                 Operator.IS_SMALLER_OR_EQUAL, 0.1f,
-                                                Stops.IMMEDIATE_RESTART,
-                            // Move away from opponent
-                            new Sequence(
-                                
+                                                Stops.IMMEDIATE_RESTART, 
+                            new Sequence( 
                                 StopTurning(),
                                 new Wait(3f),
                                 RandomMove(),
                                 RandomFire()
-
                         )),
                         new BlackboardCondition("targetOnRight",
                                                 Operator.IS_EQUAL, true,
