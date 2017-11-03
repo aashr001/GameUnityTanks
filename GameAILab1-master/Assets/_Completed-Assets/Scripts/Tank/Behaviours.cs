@@ -22,9 +22,12 @@ namespace Complete
                 case 1:
                     return DeadlyBehaviour();
 
+                case 2:
+                    return FrightenedBehaviour();
+
                 case 3:
                     return SpinBehaviour(-0.05f, 1f);
-                case 2:
+                case 4:
                     return TrackBehaviour();
 
                 
@@ -119,6 +122,33 @@ namespace Complete
                             new Sequence(new Action(() => Move(0.2f)),
                         new Action(() => Turn(1f)),
                         new Action(() => Fire(0.2f)))),
+                        new BlackboardCondition("targetOnRight",
+                                                Operator.IS_EQUAL, true,
+                                                Stops.IMMEDIATE_RESTART,
+                            // Turn right toward target
+                            new Action(() => Turn(1f))),
+                            // Turn left toward target
+                            new Action(() => Turn(-1f))
+                    )
+                )
+            );
+
+        }
+
+        //(2.Fightened) Tracks the opponent, moves away from it, doesn't shoot
+        private Root FrightenedBehaviour()
+        {
+            return new Root(
+                new Service(0.2f, UpdatePerception,
+                    new Selector(
+                        new BlackboardCondition("targetOffCentre",
+                                                Operator.IS_SMALLER_OR_EQUAL, 0.1f,
+                                                Stops.IMMEDIATE_RESTART,
+                            // Move away from opponent
+                            new Sequence(
+                                new Action(() => Turn(1f)),
+                                new Action(() => Move(-0.5f))
+                        )),
                         new BlackboardCondition("targetOnRight",
                                                 Operator.IS_EQUAL, true,
                                                 Stops.IMMEDIATE_RESTART,
