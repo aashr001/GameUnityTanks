@@ -28,12 +28,6 @@ namespace Complete
                 case 3:
                     return UnpredictableBehaviour();
 
-                case 4:
-                    return SpinBehaviour(-0.05f, 1f);
-                case 5:
-                    return TrackBehaviour();
-
-                
                 default:
                     return new Root (new Action(()=> Turn(0.1f)));
             }
@@ -73,42 +67,7 @@ namespace Complete
 
 
 
-        /* Example behaviour trees */
-
-        // Constantly spin and fire on the spot 
-        private Root SpinBehaviour(float turn, float shoot) {
-            return new Root(new Sequence(
-                        new Action(() => Turn(turn)),
-                        new Action(() => Fire(shoot))
-                    ));
-        }
-
-        // Turn to face your opponent and fire
-        private Root TrackBehaviour()
-        {
-            return new Root(
-                new Service(0.2f, UpdatePerception,
-                    new Selector(
-                        new BlackboardCondition("targetOffCentre",
-                                                Operator.IS_SMALLER_OR_EQUAL, 0.1f,
-                                                Stops.IMMEDIATE_RESTART,
-                            // Stop turning and fire
-                            new Sequence(
-                                  StopTurning(),
-                                  new Wait(2f),
-                                  RandomFire()
-                                  )),
-                        new BlackboardCondition("targetOnRight",
-                                                Operator.IS_EQUAL, true,
-                                                Stops.IMMEDIATE_RESTART,
-                            // Turn right toward target
-                            new Action(() => Turn(1f))),
-                            // Turn left toward target
-                            new Action(() => Turn(-1f))
-                    )
-                )
-            );
-        }
+        /* Behaviour trees */
 
         //(0.Fun) Constantly spin, move and fire on the spot 
         private Root FunBehaviour(float move, float turn, float shoot){
@@ -159,7 +118,7 @@ namespace Complete
                                                 Stops.IMMEDIATE_RESTART,
                                  // Move away from opponent
                                 new Sequence(
-                                    new Action(() => Turn(1f)),
+                                    new Action(() => Turn(0.5f)),
                                     new Action(() => Move(-0.5f))
                                 )),
                         new BlackboardCondition("targetOnRight",
