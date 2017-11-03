@@ -39,6 +39,22 @@ namespace Complete
             return new Action(() => Fire(UnityEngine.Random.Range(0.0f, 1.0f)));
         }
 
+        //Only moves around, that's all
+        private Root MoveOnly(float move)
+        {
+            return new Root(new Sequence(
+                new Action(() => Move(move)
+                )));
+        }
+
+        //Only fires, that's all
+        private Root FireOnly(float fire)
+        {
+            return new Root(new Sequence(
+                new Action(() => Fire(fire)
+                )));
+        }
+
 
         /* Example behaviour trees */
 
@@ -64,10 +80,10 @@ namespace Complete
         private Root TrackBehaviour()
         {
             return new Root(
-                new Service(0f, UpdatePerception,
+                new Service(0.2f, UpdatePerception,
                     new Selector(
                         new BlackboardCondition("targetOffCentre",
-                                                Operator.IS_GREATER_OR_EQUAL, 0.1f,
+                                                Operator.IS_SMALLER_OR_EQUAL, 0.1f,
                                                 Stops.IMMEDIATE_RESTART,
                             // Stop turning and fire
                             new Sequence(StopTurning(),
