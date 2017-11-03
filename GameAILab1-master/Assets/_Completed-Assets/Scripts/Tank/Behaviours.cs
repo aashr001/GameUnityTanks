@@ -16,16 +16,13 @@ namespace Complete
 
             switch (m_Behaviour) {
 
+                case 0:
+                    return MoveBehaviour(1f, 1f, 1f);
+
                 case 1:
                     return SpinBehaviour(-0.05f, 1f);
                 case 2:
                     return TrackBehaviour();
-
-                case 3:
-                    return TestTrackBehaviour();
-
-                case 4:
-                    return TestSpinBehaviour(0.9f, -0.5f);
 
                 default:
                     return new Root (new Action(()=> Turn(0.1f)));
@@ -53,15 +50,24 @@ namespace Complete
                     ));
         }
 
+        //Constantly spin, move and fire on the spot
+        private Root MoveBehaviour(float move, float turn, float shoot){
+       
+            return new Root(new Sequence(
+                        new Action(() => Move(move)),
+                        new Action(() => Turn(turn)),
+                        new Action(() => Fire(shoot))
+                ));
+        }
 
         // Turn to face your opponent and fire
         private Root TrackBehaviour()
         {
             return new Root(
-                new Service(0.2f, UpdatePerception,
+                new Service(0f, UpdatePerception,
                     new Selector(
-                        new BlackboardCondition("targetDistance",
-                                                Operator.IS_SMALLER_OR_EQUAL, 0.1f,
+                        new BlackboardCondition("targetOffCentre",
+                                                Operator.IS_GREATER_OR_EQUAL, 0.1f,
                                                 Stops.IMMEDIATE_RESTART,
                             // Stop turning and fire
                             new Sequence(StopTurning(),
@@ -79,45 +85,6 @@ namespace Complete
             );
         }
 
-
-        //Just testing what the program does
-        private Root TestTrackBehaviour()
-        {
-            return new Root(
-               new Service(0.2f, UpdatePerception,
-                   new Selector(
-                       
-                            new BlackboardCondition("targetDistance",
-                                               Operator.IS_EQUAL, true,
-                                               Stops.IMMEDIATE_RESTART,
-                           // Stop turning and fire
-                           new Sequence(new Action(() => Turn(0.2f)),
-                                       new Action(() => Turn(-0.2f)),
-                                       RandomFire())),
-                       new BlackboardCondition("targetOnRight",
-                                               Operator.IS_EQUAL, true,
-                                               Stops.IMMEDIATE_RESTART,
-                           // Turn right toward target
-                           new Action(() => Turn(0.2f))),
-                           // Turn left toward target
-                           new Action(() => Turn(-0.2f))
-                   )
-               )
-           );
-        }
-
-
-        //Lalallaaa
-        //Testing the spin behaviour
-        private Root TestSpinBehaviour(float right, float left)
-        {
-           
-            return new Root(new Sequence(
-                        new Action(() => Turn(right)),
-                        StopTurning(),
-                        new Wait(0.1f),
-                        new Action(()=> Turn(left))));
-        }
         private void UpdatePerception() {
             Vector3 targetPos = TargetTransform().position;
             Vector3 localPos = this.transform.InverseTransformPoint(targetPos);
