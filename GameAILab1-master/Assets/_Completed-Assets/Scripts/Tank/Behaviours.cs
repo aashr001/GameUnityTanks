@@ -26,6 +26,9 @@ namespace Complete
                     return FrightenedBehaviour();
 
                 case 3:
+                    return UnpredictableBehaviour();
+
+                case 5:
                     return SpinBehaviour(-0.05f, 1f);
                 case 4:
                     return TrackBehaviour();
@@ -61,6 +64,12 @@ namespace Complete
                 new Action(() => Fire(fire)
                 )));
         }
+
+        private Node RandomMove()
+        {
+            return new Action(() => Move(UnityEngine.Random.Range(-1f, 1f)));
+        }
+
 
 
         /* Example behaviour trees */
@@ -119,9 +128,9 @@ namespace Complete
                                                 Operator.IS_SMALLER_OR_EQUAL, 0.1f,
                                                 Stops.IMMEDIATE_RESTART,
                             // Move towards opponent, turn and fire
-                            new Sequence(new Action(() => Move(0.2f)),
+                            new Sequence(new Action(() => Move(0.4f)),
                         new Action(() => Turn(1f)),
-                        new Action(() => Fire(0.2f)))),
+                        new Action(() => Fire(-1f)))),
                         new BlackboardCondition("targetOnRight",
                                                 Operator.IS_EQUAL, true,
                                                 Stops.IMMEDIATE_RESTART,
@@ -161,6 +170,37 @@ namespace Complete
             );
 
         }
+
+        private Root UnpredictableBehaviour()
+        {
+            return new Root(
+                new Service(0.2f, UpdatePerception,
+                    new Selector(
+                        new BlackboardCondition("targetOffCentre",
+                                                Operator.IS_SMALLER_OR_EQUAL, 0.1f,
+                                                Stops.IMMEDIATE_RESTART,
+                            // Move away from opponent
+                            new Sequence(
+                                
+                                StopTurning(),
+                                new Wait(2f),
+                                RandomMove(),
+                                RandomFire()
+
+                        )),
+                        new BlackboardCondition("targetOnRight",
+                                                Operator.IS_EQUAL, true,
+                                                Stops.IMMEDIATE_RESTART,
+                            // Turn right toward target
+                            new Action(() => Turn(1f))),
+                            // Turn left toward target
+                            new Action(() => Turn(-1f))
+                    )
+                )
+            );
+
+        }
+
         private void UpdatePerception() {
             Vector3 targetPos = TargetTransform().position;
             Vector3 localPos = this.transform.InverseTransformPoint(targetPos);
