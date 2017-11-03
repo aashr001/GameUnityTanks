@@ -17,13 +17,17 @@ namespace Complete
             switch (m_Behaviour) {
 
                 case 0:
-                    return MoveBehaviour(1f, 1f, 1f);
+                    return FunBehaviour(1f, 1f, 1f);
 
                 case 1:
+                    return DeadlyBehaviour();
+
+                case 3:
                     return SpinBehaviour(-0.05f, 1f);
                 case 2:
                     return TrackBehaviour();
 
+                
                 default:
                     return new Root (new Action(()=> Turn(0.1f)));
             }
@@ -66,8 +70,9 @@ namespace Complete
                     ));
         }
 
-        //Constantly spin, move and fire on the spot
-        private Root MoveBehaviour(float move, float turn, float shoot){
+
+        //(0.Fun) Constantly spin, move and fire on the spot 
+        private Root FunBehaviour(float move, float turn, float shoot){
        
             return new Root(new Sequence(
                         new Action(() => Move(move)),
@@ -101,6 +106,31 @@ namespace Complete
             );
         }
 
+        //(1.Deadly) Tracks the opponent, moves towards it and constantly shoots
+        private Root DeadlyBehaviour()
+        {
+            return new Root(
+                new Service(0.2f, UpdatePerception,
+                    new Selector(
+                        new BlackboardCondition("targetOffCentre",
+                                                Operator.IS_SMALLER_OR_EQUAL, 0.1f,
+                                                Stops.IMMEDIATE_RESTART,
+                            // Move towards opponent, turn and fire
+                            new Sequence(new Action(() => Move(0.2f)),
+                        new Action(() => Turn(1f)),
+                        new Action(() => Fire(0.2f)))),
+                        new BlackboardCondition("targetOnRight",
+                                                Operator.IS_EQUAL, true,
+                                                Stops.IMMEDIATE_RESTART,
+                            // Turn right toward target
+                            new Action(() => Turn(1f))),
+                            // Turn left toward target
+                            new Action(() => Turn(-1f))
+                    )
+                )
+            );
+
+        }
         private void UpdatePerception() {
             Vector3 targetPos = TargetTransform().position;
             Vector3 localPos = this.transform.InverseTransformPoint(targetPos);
